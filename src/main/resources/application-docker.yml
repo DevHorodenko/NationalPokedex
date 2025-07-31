@@ -1,0 +1,25 @@
+spring:
+  # Database Configuration for Docker
+  datasource:
+    url: jdbc:postgresql://db:5432/pokedex
+    driver-class-name: org.postgresql.Driver
+    username: pokedex_user
+    password: pokedex_password
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Logging Configuration for Docker
+logging:
+  level:
+    com.nationalpokedex.api: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
