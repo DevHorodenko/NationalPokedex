@@ -200,6 +200,131 @@ docker build -t national-pokedex-api .
 docker run -p 8080:8080 --name national-pokedex-api national-pokedex-api
 ```
 
+## 🗄️ Database Access
+
+The application includes multiple ways to access and manage the PostgreSQL database running in Docker.
+
+### 📊 Method 1: Command Line (psql)
+
+Connect directly to the database using the PostgreSQL command-line client:
+
+```bash
+# Connect to database
+docker exec -it nationalpokedex-db-1 psql -U pokedex_user -d pokedex
+```
+
+**Useful psql commands once connected:**
+```sql
+\dt                    -- List all tables
+\d table_name          -- Describe table structure
+SELECT * FROM pokemons LIMIT 5;  -- View data
+\q                     -- Quit
+```
+
+**Run single commands without entering psql:**
+```bash
+# List all tables
+docker exec -it nationalpokedex-db-1 psql -U pokedex_user -d pokedex -c "\dt"
+
+# View pokemon data
+docker exec -it nationalpokedex-db-1 psql -U pokedex_user -d pokedex -c "SELECT pokemon_number, name, hp, attack, defense FROM pokemons ORDER BY pokemon_number;"
+
+# Count pokemon by type
+docker exec -it nationalpokedex-db-1 psql -U pokedex_user -d pokedex -c "SELECT pt.type, COUNT(*) as count FROM pokemon_types pt GROUP BY pt.type ORDER BY count DESC;"
+
+# Check database size
+docker exec -it nationalpokedex-db-1 psql -U pokedex_user -d pokedex -c "SELECT pg_size_pretty(pg_database_size('pokedex'));"
+```
+
+### 🌐 Method 2: Web-based Admin (pgAdmin)
+
+The application includes pgAdmin for web-based database administration:
+
+- **URL**: `http://localhost:5050`
+- **Email**: `admin@nationalpokedex.com`
+- **Password**: `admin123`
+
+**Steps to connect in pgAdmin:**
+1. Open `http://localhost:5050` in your browser
+2. Login with the credentials above
+3. Right-click "Servers" → "Register" → "Server"
+4. **General Tab**: Name = "National Pokedex"
+5. **Connection Tab**:
+   - Host: `db` (or `localhost` if connecting from outside Docker)
+   - Port: `5432`
+   - Database: `pokedex`
+   - Username: `pokedex_user`
+   - Password: `pokedex_password`
+
+### 🖥️ Method 3: External GUI Tools
+
+Connect with any PostgreSQL client using these connection details:
+
+- **Host**: `localhost`
+- **Port**: `5432`
+- **Database**: `pokedex`
+- **Username**: `pokedex_user`
+- **Password**: `pokedex_password`
+
+**Popular GUI Tools:**
+- **pgAdmin** (Free, web-based)
+- **DBeaver** (Free, cross-platform)
+- **DataGrip** (JetBrains, paid)
+- **TablePlus** (Mac/Windows, paid)
+
+### 📋 Useful Database Queries
+
+**View all Pokemon with their types:**
+```sql
+SELECT p.pokemon_number, p.name, string_agg(pt.type, ', ') as types
+FROM pokemons p 
+LEFT JOIN pokemon_types pt ON p.id = pt.pokemon_id 
+GROUP BY p.pokemon_number, p.name 
+ORDER BY p.pokemon_number;
+```
+
+**View Pokemon stats:**
+```sql
+SELECT pokemon_number, name, hp, attack, defense, speed 
+FROM pokemons 
+ORDER BY pokemon_number;
+```
+
+**Find Pokemon by type:**
+```sql
+SELECT p.pokemon_number, p.name, pt.type
+FROM pokemons p 
+JOIN pokemon_types pt ON p.id = pt.pokemon_id 
+WHERE pt.type = 'Fire'
+ORDER BY p.pokemon_number;
+```
+
+**View user data:**
+```sql
+SELECT id, username, email, first_name, last_name, role, is_active 
+FROM users 
+ORDER BY created_at;
+```
+
+### 🔧 Database Management
+
+**Backup the database:**
+```bash
+docker exec -t nationalpokedex-db-1 pg_dump -U pokedex_user -d pokedex > backup.sql
+```
+
+**Restore the database:**
+```bash
+docker exec -i nationalpokedex-db-1 psql -U pokedex_user -d pokedex < backup.sql
+```
+
+**Reset the database (reinitialize with sample data):**
+```bash
+docker-compose down
+docker volume rm nationalpokedex_postgres_data
+docker-compose up -d
+```
+
 ## 🔧 Configuration
 
 ### Application Profiles

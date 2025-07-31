@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -11,9 +9,11 @@ services:
       - SPRING_DATASOURCE_USERNAME=pokedex_user
       - SPRING_DATASOURCE_PASSWORD=pokedex_password
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - pokedex-network
+    restart: unless-stopped
 
   db:
     image: postgres:15-alpine
@@ -28,6 +28,25 @@ services:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - pokedex-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pokedex_user -d pokedex"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@nationalpokedex.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - pokedex-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
