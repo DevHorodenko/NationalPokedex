@@ -16,6 +16,7 @@ A comprehensive REST API backend for managing Pokemon data and user collections,
 
 ## 🛠️ Technology Stack
 
+### Backend
 - **Java 17**
 - **Spring Boot 3.2.0**
 - **Spring Security** with JWT
@@ -27,11 +28,25 @@ A comprehensive REST API backend for managing Pokemon data and user collections,
 - **Swagger/OpenAPI 3**
 - **JUnit 5**
 
+### Frontend
+- **React 18**
+- **React Router 6**
+- **React Query**
+- **Tailwind CSS**
+- **Lucide React**
+- **React Hook Form**
+- **Axios**
+
 ## 📋 Prerequisites
 
+### Backend
 - Java 17 or higher
 - Maven 3.6 or higher
 - PostgreSQL 12 or higher
+
+### Frontend
+- Node.js 16 or higher
+- npm or yarn
 
 ## 🚀 Getting Started
 
@@ -56,7 +71,7 @@ chmod +x database/setup_database.sh
 
 For detailed database setup instructions, see [database/README.md](database/README.md).
 
-### 3. Run the application
+### 3. Run the Backend
 ```bash
 # Development mode (creates/drops schema automatically)
 mvn spring-boot:run -Dspring.profiles.active=dev
@@ -65,11 +80,22 @@ mvn spring-boot:run -Dspring.profiles.active=dev
 mvn spring-boot:run
 ```
 
-The application will start on `http://localhost:8080`
+The backend will start on `http://localhost:8080`
 
-### 4. Access the API documentation
-- Swagger UI: `http://localhost:8080/api/v1/swagger-ui.html`
-- API Docs: `http://localhost:8080/api/v1/api-docs`
+### 4. Run the Frontend
+```bash
+cd frontend
+npm install
+npm start
+```
+
+The frontend will start on `http://localhost:3000`
+
+### 5. Access the applications
+- **Frontend**: `http://localhost:3000`
+- **Backend API**: `http://localhost:8080`
+- **Swagger UI**: `http://localhost:8080/api/v1/swagger-ui.html`
+- **API Docs**: `http://localhost:8080/api/v1/api-docs`
 
 ## 📚 API Endpoints
 
@@ -103,6 +129,23 @@ The API uses JWT (JSON Web Tokens) for authentication. To access protected endpo
 
 1. Register or login to get a JWT token
 2. Include the token in the Authorization header: `Bearer <token>`
+
+### Environment Variables
+
+For security, set the following environment variables:
+
+```bash
+# JWT Configuration (REQUIRED for production)
+export JWT_SECRET="your-very-long-and-secure-secret-key-at-least-64-characters"
+export JWT_EXPIRATION=86400000
+
+# Database Configuration
+export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/pokedex"
+export SPRING_DATASOURCE_USERNAME="pokedex_user"
+export SPRING_DATASOURCE_PASSWORD="pokedex_password"
+```
+
+**⚠️ Security Note**: The JWT secret must be at least 64 characters long for HS512 algorithm. Never commit the actual secret to version control.
 
 ### Example:
 ```bash
@@ -176,7 +219,7 @@ java -jar target/api-backend-1.0.0.jar
 The easiest way to run the application with PostgreSQL:
 
 ```bash
-# Start the application with PostgreSQL
+# Start the backend with PostgreSQL
 docker-compose up
 
 # Run in background
@@ -188,16 +231,150 @@ docker-compose down
 
 This will start:
 - PostgreSQL database on port 5432
-- Spring Boot application on port 8080
+- Spring Boot backend on port 8080
 - Database will be automatically initialized with sample data
+
+### Frontend Development
+For frontend development, run it separately:
+
+```bash
+cd frontend
+npm install
+npm start
+```
 
 ### Manual Docker Setup
 ```bash
-# Build the application
+# Build the backend
 docker build -t national-pokedex-api .
 
 # Run with PostgreSQL
 docker run -p 8080:8080 --name national-pokedex-api national-pokedex-api
+```
+
+## 🗄️ Database Access
+
+The application includes multiple ways to access and manage the PostgreSQL database running in Docker.
+
+### 📊 Method 1: Command Line (psql)
+
+Connect directly to the database using the PostgreSQL command-line client:
+
+```bash
+# Connect to database
+docker exec -it nationalpokedex-db-1 psql -U pokedex_user -d pokedex
+```
+
+**Useful psql commands once connected:**
+```sql
+\dt                    -- List all tables
+\d table_name          -- Describe table structure
+SELECT * FROM pokemons LIMIT 5;  -- View data
+\q                     -- Quit
+```
+
+**Run single commands without entering psql:**
+```bash
+# List all tables
+docker exec -it nationalpokedex-db-1 psql -U pokedex_user -d pokedex -c "\dt"
+
+# View pokemon data
+docker exec -it nationalpokedex-db-1 psql -U pokedex_user -d pokedex -c "SELECT pokemon_number, name, hp, attack, defense FROM pokemons ORDER BY pokemon_number;"
+
+# Count pokemon by type
+docker exec -it nationalpokedex-db-1 psql -U pokedex_user -d pokedex -c "SELECT pt.type, COUNT(*) as count FROM pokemon_types pt GROUP BY pt.type ORDER BY count DESC;"
+
+# Check database size
+docker exec -it nationalpokedex-db-1 psql -U pokedex_user -d pokedex -c "SELECT pg_size_pretty(pg_database_size('pokedex'));"
+```
+
+### 🌐 Method 2: Web-based Admin (pgAdmin)
+
+The application includes pgAdmin for web-based database administration:
+
+- **URL**: `http://localhost:5050`
+- **Email**: `admin@nationalpokedex.com`
+- **Password**: `admin123`
+
+**Steps to connect in pgAdmin:**
+1. Open `http://localhost:5050` in your browser
+2. Login with the credentials above
+3. Right-click "Servers" → "Register" → "Server"
+4. **General Tab**: Name = "National Pokedex"
+5. **Connection Tab**:
+   - Host: `db` (or `localhost` if connecting from outside Docker)
+   - Port: `5432`
+   - Database: `pokedex`
+   - Username: `pokedex_user`
+   - Password: `pokedex_password`
+
+### 🖥️ Method 3: External GUI Tools
+
+Connect with any PostgreSQL client using these connection details:
+
+- **Host**: `localhost`
+- **Port**: `5432`
+- **Database**: `pokedex`
+- **Username**: `pokedex_user`
+- **Password**: `pokedex_password`
+
+**Popular GUI Tools:**
+- **pgAdmin** (Free, web-based)
+- **DBeaver** (Free, cross-platform)
+- **DataGrip** (JetBrains, paid)
+- **TablePlus** (Mac/Windows, paid)
+
+### 📋 Useful Database Queries
+
+**View all Pokemon with their types:**
+```sql
+SELECT p.pokemon_number, p.name, string_agg(pt.type, ', ') as types
+FROM pokemons p 
+LEFT JOIN pokemon_types pt ON p.id = pt.pokemon_id 
+GROUP BY p.pokemon_number, p.name 
+ORDER BY p.pokemon_number;
+```
+
+**View Pokemon stats:**
+```sql
+SELECT pokemon_number, name, hp, attack, defense, speed 
+FROM pokemons 
+ORDER BY pokemon_number;
+```
+
+**Find Pokemon by type:**
+```sql
+SELECT p.pokemon_number, p.name, pt.type
+FROM pokemons p 
+JOIN pokemon_types pt ON p.id = pt.pokemon_id 
+WHERE pt.type = 'Fire'
+ORDER BY p.pokemon_number;
+```
+
+**View user data:**
+```sql
+SELECT id, username, email, first_name, last_name, role, is_active 
+FROM users 
+ORDER BY created_at;
+```
+
+### 🔧 Database Management
+
+**Backup the database:**
+```bash
+docker exec -t nationalpokedex-db-1 pg_dump -U pokedex_user -d pokedex > backup.sql
+```
+
+**Restore the database:**
+```bash
+docker exec -i nationalpokedex-db-1 psql -U pokedex_user -d pokedex < backup.sql
+```
+
+**Reset the database (reinitialize with sample data):**
+```bash
+docker-compose down
+docker volume rm nationalpokedex_postgres_data
+docker-compose up -d
 ```
 
 ## 🔧 Configuration
