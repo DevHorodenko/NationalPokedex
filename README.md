@@ -16,6 +16,7 @@ A comprehensive REST API backend for managing Pokemon data and user collections,
 
 ## 🛠️ Technology Stack
 
+### Backend
 - **Java 17**
 - **Spring Boot 3.2.0**
 - **Spring Security** with JWT
@@ -27,11 +28,25 @@ A comprehensive REST API backend for managing Pokemon data and user collections,
 - **Swagger/OpenAPI 3**
 - **JUnit 5**
 
+### Frontend
+- **React 18**
+- **React Router 6**
+- **React Query**
+- **Tailwind CSS**
+- **Lucide React**
+- **React Hook Form**
+- **Axios**
+
 ## 📋 Prerequisites
 
+### Backend
 - Java 17 or higher
 - Maven 3.6 or higher
 - PostgreSQL 12 or higher
+
+### Frontend
+- Node.js 16 or higher
+- npm or yarn
 
 ## 🚀 Getting Started
 
@@ -56,7 +71,7 @@ chmod +x database/setup_database.sh
 
 For detailed database setup instructions, see [database/README.md](database/README.md).
 
-### 3. Run the application
+### 3. Run the Backend
 ```bash
 # Development mode (creates/drops schema automatically)
 mvn spring-boot:run -Dspring.profiles.active=dev
@@ -65,11 +80,22 @@ mvn spring-boot:run -Dspring.profiles.active=dev
 mvn spring-boot:run
 ```
 
-The application will start on `http://localhost:8080`
+The backend will start on `http://localhost:8080`
 
-### 4. Access the API documentation
-- Swagger UI: `http://localhost:8080/api/v1/swagger-ui.html`
-- API Docs: `http://localhost:8080/api/v1/api-docs`
+### 4. Run the Frontend
+```bash
+cd frontend
+npm install
+npm start
+```
+
+The frontend will start on `http://localhost:3000`
+
+### 5. Access the applications
+- **Frontend**: `http://localhost:3000`
+- **Backend API**: `http://localhost:8080`
+- **Swagger UI**: `http://localhost:8080/api/v1/swagger-ui.html`
+- **API Docs**: `http://localhost:8080/api/v1/api-docs`
 
 ## 📚 API Endpoints
 
@@ -103,6 +129,23 @@ The API uses JWT (JSON Web Tokens) for authentication. To access protected endpo
 
 1. Register or login to get a JWT token
 2. Include the token in the Authorization header: `Bearer <token>`
+
+### Environment Variables
+
+For security, set the following environment variables:
+
+```bash
+# JWT Configuration (REQUIRED for production)
+export JWT_SECRET="your-very-long-and-secure-secret-key-at-least-64-characters"
+export JWT_EXPIRATION=86400000
+
+# Database Configuration
+export SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/pokedex"
+export SPRING_DATASOURCE_USERNAME="pokedex_user"
+export SPRING_DATASOURCE_PASSWORD="pokedex_password"
+```
+
+**⚠️ Security Note**: The JWT secret must be at least 64 characters long for HS512 algorithm. Never commit the actual secret to version control.
 
 ### Example:
 ```bash
@@ -176,7 +219,7 @@ java -jar target/api-backend-1.0.0.jar
 The easiest way to run the application with PostgreSQL:
 
 ```bash
-# Start the application with PostgreSQL
+# Start the backend with PostgreSQL
 docker-compose up
 
 # Run in background
@@ -188,12 +231,21 @@ docker-compose down
 
 This will start:
 - PostgreSQL database on port 5432
-- Spring Boot application on port 8080
+- Spring Boot backend on port 8080
 - Database will be automatically initialized with sample data
+
+### Frontend Development
+For frontend development, run it separately:
+
+```bash
+cd frontend
+npm install
+npm start
+```
 
 ### Manual Docker Setup
 ```bash
-# Build the application
+# Build the backend
 docker build -t national-pokedex-api .
 
 # Run with PostgreSQL

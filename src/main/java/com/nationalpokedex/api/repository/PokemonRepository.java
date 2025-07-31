@@ -23,6 +23,9 @@ public interface PokemonRepository extends JpaRepository<Pokemon, Long> {
     @Query("SELECT p FROM Pokemon p WHERE p.user.id = :userId")
     Page<Pokemon> findByUserId(@Param("userId") Long userId, Pageable pageable);
     
+    @Query("SELECT p FROM Pokemon p WHERE p.user.username = :username")
+    Page<Pokemon> findByUserUsername(@Param("username") String username, Pageable pageable);
+    
     @Query("SELECT p FROM Pokemon p WHERE p.pokemonNumber BETWEEN :start AND :end")
     List<Pokemon> findByPokemonNumberRange(@Param("start") Integer start, @Param("end") Integer end);
     

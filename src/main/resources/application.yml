@@ -35,8 +35,8 @@ server:
 
 # Security Configuration
 jwt:
-  secret: your-secret-key-here-make-it-long-and-secure-in-production
-  expiration: 86400000 # 24 hours in milliseconds
+  secret: ${JWT_SECRET:8Zz5tw0Ionm3XPZZfN0NOml3z9FMfmpgXwovR9fp6ryDIoGRM8EPHAB6iHsc0fb8Zz5tw0Ionm3XPZZfN0NOml3z9FMfmpgXwovR9fp6ryDIoGRM8EPHAB6iHsc0fb}
+  expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
 
 # Actuator Configuration
 management:

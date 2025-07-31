@@ -77,20 +77,16 @@ public class PokemonController {
     public ResponseEntity<Page<PokemonDto>> getMyPokemons(
             @PageableDefault(size = 20) Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // In a real application, you would get the user ID from the authentication
-        // For now, we'll use a placeholder
-        Long userId = 1L; // This should be extracted from the authentication
-        return ResponseEntity.ok(pokemonService.getPokemonsByUserId(userId, pageable));
+        String username = authentication.getName();
+        return ResponseEntity.ok(pokemonService.getPokemonsByUsername(username, pageable));
     }
 
     @PostMapping
     @Operation(summary = "Create pokemon", description = "Create a new pokemon")
     public ResponseEntity<PokemonDto> createPokemon(@Valid @RequestBody Pokemon pokemon) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // In a real application, you would get the user ID from the authentication
-        // For now, we'll use a placeholder
-        Long userId = 1L; // This should be extracted from the authentication
-        PokemonDto createdPokemon = pokemonService.createPokemon(pokemon, userId);
+        String username = authentication.getName();
+        PokemonDto createdPokemon = pokemonService.createPokemon(pokemon, username);
         return ResponseEntity.ok(createdPokemon);
     }
 

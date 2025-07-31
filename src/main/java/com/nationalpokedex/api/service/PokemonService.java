@@ -63,6 +63,11 @@ public class PokemonService {
                 .map(this::convertToDto);
     }
 
+    public Page<PokemonDto> getPokemonsByUsername(String username, Pageable pageable) {
+        return pokemonRepository.findByUserUsername(username, pageable)
+                .map(this::convertToDto);
+    }
+
     public List<PokemonDto> getPokemonsByNumberRange(Integer start, Integer end) {
         return pokemonRepository.findByPokemonNumberRange(start, end).stream()
                 .map(this::convertToDto)
@@ -80,6 +85,20 @@ public class PokemonService {
         pokemon.setUser(user);
         Pokemon savedPokemon = pokemonRepository.save(pokemon);
         log.info("Created new Pokemon: {} (Number: {})", savedPokemon.getName(), savedPokemon.getPokemonNumber());
+        return convertToDto(savedPokemon);
+    }
+
+    public PokemonDto createPokemon(Pokemon pokemon, String username) {
+        if (pokemonRepository.existsByPokemonNumber(pokemon.getPokemonNumber())) {
+            throw new RuntimeException("Pokemon with this number already exists");
+        }
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        pokemon.setUser(user);
+        Pokemon savedPokemon = pokemonRepository.save(pokemon);
+        log.info("Created new Pokemon: {} (Number: {}) by user: {}", savedPokemon.getName(), savedPokemon.getPokemonNumber(), username);
         return convertToDto(savedPokemon);
     }
 
