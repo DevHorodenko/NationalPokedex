@@ -10,7 +10,7 @@ A comprehensive REST API backend for managing Pokemon data and user collections,
 - **Role-based Authorization**: User and Admin roles with different permissions
 - **RESTful API**: Well-structured REST endpoints
 - **Swagger Documentation**: Interactive API documentation
-- **Database Support**: H2 (development) and PostgreSQL (production)
+- **Database Support**: PostgreSQL 
 - **Comprehensive Testing**: Unit and integration tests
 - **Actuator**: Health checks and monitoring endpoints
 
